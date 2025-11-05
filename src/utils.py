@@ -315,48 +315,38 @@ class context_extractor():
 
         # Input variables
         all_knowledge_units = self.all_knowledge_units
-        current_chunk = current_multimodel_unit
+        current_item = current_multimodel_unit
 
         # As it is list of chunk because of figure & caption unit so, we need to find out only figure unit as reference for placement of current chunk
-        chunk_of_figure = None
+        unit_of_figure = None
         # Placement details of the current chunk
-        for chunk in current_chunk:
-            if "table_image_path" in chunk:
-                page_of_current_chunk = chunk.get("page_no.","")
-                page_index_of_current_chunk = chunk.get("index_on_page","")
-                content_of_current_chunk = chunk.get("table_image_path","")
-                chunk_of_figure = chunk
+        for unit in current_item:
+            if "table_image_path" in unit:
+                page_of_current_unit = unit.get("page_no.","")
+                page_index_of_current_unit = unit.get("index_on_page","")
+                content_of_current_unit = unit.get("table_image_path","")
+                unit_of_figure = unit
         
-        surrounding_pages_chunks = []
+        surrounding_pages_units = []
 
         # Previous page & Next page 
-        previous_page = page_of_current_chunk - 1
-        next_page = page_of_current_chunk + 1
-        pages_relvant_for_context = [previous_page,page_of_current_chunk,next_page]
+        previous_page = page_of_current_unit - 1
+        next_page = page_of_current_unit + 1
+        pages_relvant_for_context = [previous_page,page_of_current_unit,next_page]
         # Fetch all the chunks from previous page, current page, and next page (In this hierarchical order)
         for page in pages_relvant_for_context:
-            for chunks in combined_knowledge_units:
-                if chunks.get("page_no.") == page:
-                    surrounding_pages_chunks.append(chunks)
+            for unit in combined_knowledge_units:
+                if unit.get("page_no.") == page:
+                    surrounding_pages_units.append(unit)
 
         # Fetch the index of the current chunk in the list of surrounding chunks
-        index_of_current_chunk = surrounding_pages_chunks.index(chunk_of_figure)
+        index_of_current_unit = surrounding_pages_units.index(unit_of_figure)
         
         # Fetch previous two chunks
-        index_of_previous_chunk_1 = index_of_current_chunk - 1
-        index_of_previous__chunk_2 = index_of_current_chunk - 2
-        indexes_of_previous_chunks = [index_of_previous_chunk_1,index_of_previous__chunk_2]
-        list_of_previous_chunks = [surrounding_pages_chunks[i] for i in indexes_of_previous_chunks]
+        range_of_surrounding_chunks = list(range(index_of_current_unit-2, index_of_current_unit+3))
+        list_of_context_chunks = [surrounding_pages_units[i] for i in range_of_surrounding_chunks]
 
-        # Fetch next two chunks 
-        index_of_next_chunk_1 = index_of_current_chunk + 1
-        index_of_next__chunk_2 = index_of_current_chunk + 2
-        indexes_of_next_chunks = [index_of_next_chunk_1,index_of_next__chunk_2]
-        list_of_next_chunks = [surrounding_pages_chunks[i] for i in indexes_of_next_chunks]
-
-
-
-        return print(list_of_next_chunks, surrounding_pages_chunks)
+        return print(list_of_context_chunks)
 
 
 if __name__ == "__main__":
@@ -365,3 +355,4 @@ if __name__ == "__main__":
 
     extractor = context_extractor(all_knowledge_units=combined_knowledge_units)
     extractor.multi_model_extractor(current_multi_model_unit=current_multimodel_unit)
+
