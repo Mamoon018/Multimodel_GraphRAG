@@ -308,8 +308,10 @@ class context_extractor():
         5- Fetch the next two & previous two chunks of the current chunk from this list.
             (a) loop over the list to find out the current chunk (Done)
             (b) Findout the index of the current chunk in the list (Done)
-            (c) Fetch the previous two chunks - if text or title then add, under title break the loop else add another chunk. (In-progress)
-            (e) Fetch the next two chunks - if text then add else break the loop.
+            (c) Fetch the previous two chunks and next two chunks from the units (Done)
+            (d) Fetch 
+        
+        Detect source type --> Source Handler --> Windowing --> Extract --> Truncate
                 
         """
 
@@ -329,6 +331,7 @@ class context_extractor():
         
         surrounding_pages_units = []
 
+
         # Previous page & Next page 
         previous_page = page_of_current_unit - 1
         next_page = page_of_current_unit + 1
@@ -340,13 +343,28 @@ class context_extractor():
                     surrounding_pages_units.append(unit)
 
         # Fetch the index of the current chunk in the list of surrounding chunks
+        chunk_window = 2
         index_of_current_unit = surrounding_pages_units.index(unit_of_figure)
+        start_index = max(0,index_of_current_unit - chunk_window)
+        end_index = min(len(surrounding_pages_units), index_of_current_unit + chunk_window + 1)
         
         # Fetch previous two chunks
-        range_of_surrounding_chunks = list(range(index_of_current_unit-2, index_of_current_unit+3))
+        range_of_surrounding_chunks = list(range(start_index, end_index))
         list_of_context_chunks = [surrounding_pages_units[i] for i in range_of_surrounding_chunks]
 
+
+        # 
+
+
+
         return print(list_of_context_chunks)
+
+    
+
+
+
+
+
 
 
 if __name__ == "__main__":
