@@ -1,6 +1,6 @@
 
-from src.document_parsing.sample_data import combined_knowledge_units, multi_model_knowledge_units
-from src.content_processor.schemas import table_description_schema
+from src.document_parsing.sample_data import combined_knowledge_units, sample_multi_model_knowledge_units
+from src.context_generator.schemas import table_description_schema
 from src.content_processor.prompt import TABLE_CONTENT_WITH_CONTEXT_PROMPT
 from perplexity import Perplexity
 import perplexity
@@ -50,7 +50,7 @@ class Context_Extractor():
         for multi_model_context_unit in self.multi_model_units_with_contextual_chunks: 
             multi_model_description = self.Information_generation_processor(
                                         multi_model_chunks_with_contextual_texts=multi_model_context_unit)
-            multi_model_context_unit["Table_description"] = multi_model_description
+            multi_model_context_unit["raw_content"] = multi_model_description
             multi_model_units_with_textual_description.append(multi_model_context_unit)
 
         return multi_model_units_with_textual_description
@@ -232,17 +232,18 @@ class Context_Extractor():
 
 
 
-
+"""
 
 if __name__ == "__main__":
 
     context_extraction = Context_Extractor(combined_knowledge_units=combined_knowledge_units,
-                                           multi_model_knowledge_units=multi_model_knowledge_units,
+                                           multi_model_knowledge_units=sample_multi_model_knowledge_units,
                                            llm_schema=table_description_schema)
 
     multi_model_final_chunks = context_extraction.__run_context_extractor__()
 
 
-
     print(multi_model_final_chunks)
 
+
+"""

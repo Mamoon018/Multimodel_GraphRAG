@@ -287,7 +287,7 @@ class MinerU_Parser():
             if platform.system == "Windows":
                 minerU_subprocess_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-            run_minerU_for_checking = subprocess.run(["C:\\Users\\Hp\\AppData\\Local\\Programs\\MinerU\\MinerU.exe", "--version"], **minerU_subprocess_kwargs)
+            subprocess.run(["C:\\Users\\Hp\\AppData\\Local\\Programs\\MinerU\\MinerU.exe", "--version"], **minerU_subprocess_kwargs)
 
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):
