@@ -48,9 +48,12 @@ class Context_Extractor():
         # multi model units with llm generated description
         multi_model_units_with_textual_description = []
         for multi_model_context_unit in self.multi_model_units_with_contextual_chunks: 
-            multi_model_description = self.Information_generation_processor(
-                                        multi_model_chunks_with_contextual_texts=multi_model_context_unit)
+            multi_model_description, entity_summary = self.Information_generation_processor(
+                multi_model_chunks_with_contextual_texts=multi_model_context_unit
+                )
+            
             multi_model_context_unit["raw_content"] = multi_model_description
+            multi_model_context_unit["entity_summary"] = entity_summary
             multi_model_units_with_textual_description.append(multi_model_context_unit)
 
         return multi_model_units_with_textual_description
@@ -111,8 +114,11 @@ class Context_Extractor():
         
         # Fetch previous two chunks
         range_of_surrounding_chunks = list(range(start_index, end_index))
-        list_of_context_chunks = [surrounding_pages_units[i] for i in range_of_surrounding_chunks if i != index_of_current_unit]
-
+        list_of_context_chunks = [
+            surrounding_pages_units[i] 
+            for i in range_of_surrounding_chunks 
+            if i != index_of_current_unit
+                                  ]
 
         """
         Imp Note: For multi-model content context extraction, we do not need to store previous & next chunks separately. It is because
@@ -140,7 +146,7 @@ class Context_Extractor():
         **Returns:**
         Content_description (list[str]): It is the detailed description of the multi-model content
         Entity_summary (dict): It contains the information which we need to include table-description as node in knowledge Graph. It contains
-                                entity name, entity type, entity description for knowledge Graph.
+                                entity name, entity type, related_entities, entity description for knowledge Graph.
         
         """
         
@@ -214,7 +220,7 @@ class Context_Extractor():
             table_description = llm_structured_output.get("content_description","")
             entity_summary = llm_structured_output.get("entity_summary","")
 
-            return table_description
+            return table_description, entity_summary
         except perplexity.BadRequestError as e:
             print(f"Invalid request parameters: {e}")
         except perplexity.RateLimitError as e:
@@ -244,6 +250,5 @@ if __name__ == "__main__":
 
 
     print(multi_model_final_chunks)
-
 
 """

@@ -95,15 +95,18 @@ class MinerU_Parser():
             
             # lets define the subprocess for minerU
             data_file_path = self.data_file_path
-
-            subprocess_minerU_output = subprocess.run(["C:\\Users\\Hp\\AppData\\Local\\Programs\\MinerU\\MinerU.exe", "--path", f"{data_file_path}", "--output", "C:\\Users\\Hp\\Documents\\AI Projects docs\\RAG\\Parsed_output", 
-                                            "--method", "auto", 
-                                            "--backend", "pipeline", 
-                                            "--start", "0", 
-                                            "--end", "2"],
-                                            check=True,
-                                            capture_output= True
-                                            ,cwd="C:\\Users\\Hp\\Documents\\AI Projects docs\\RAG" )
+            subprocess_minerU_output = subprocess.run(
+                ["C:\\Users\\Hp\\AppData\\Local\\Programs\\MinerU\\MinerU.exe", 
+                 "--path", f"{data_file_path}", 
+                 "--output", "C:\\Users\\Hp\\Documents\\AI Projects docs\\RAG\\Parsed_output", 
+                 "--method", "auto", 
+                 "--backend", "pipeline", 
+                 "--start", "0", 
+                 "--end", "2"],
+                 check=True,
+                 capture_output= True,
+                 cwd="C:\\Users\\Hp\\Documents\\AI Projects docs\\RAG"
+                 )
             
             self.MinerU_code = subprocess_minerU_output.returncode
             self.MinerU_output = subprocess_minerU_output.stdout.decode("utf-8")
@@ -138,7 +141,7 @@ class MinerU_Parser():
 
         """
 
-        # Read .
+        # Read.
         mineru_returncode = self.MinerU_code
 
         # set directory

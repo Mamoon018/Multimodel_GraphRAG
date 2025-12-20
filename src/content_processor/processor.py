@@ -110,7 +110,7 @@ class processor_storage():
         for payload, collection_created in zip(vectorized_payloads, collections_to_be_generated):
             collection_data_view = self.VDB_data_insertion_task(payloads=payload,collection=collection_created)
         
-                
+            
         return    collection_data_view
         
 
@@ -131,7 +131,6 @@ class processor_storage():
 
         """
 
-
         # Get a document id
         doc_id = self.document_id
         # Get a doc title
@@ -146,21 +145,32 @@ class processor_storage():
         current_item["chunk_id"] = chunk_id
         current_item["document_title"] = doc_title
 
-        # Get the JSON of Metadata
-        metadata = {
-            "page_no.": current_item["page_no."],
-            "index_on_page": current_item["index_on_page"],
-            "content_type": current_item["content_type"],
-            "document_title": current_item["document_title"]
-        }
+        if current_item["content_type"] == "table":
+            # Get the JSON of Metadata
+            metadata = {
+                "page_no.": current_item["page_no."],
+                "index_on_page": current_item["index_on_page"],
+                "content_type": current_item["content_type"],
+                "document_title": current_item["document_title"],
+                "entity_summary": current_item["entity_summary"]
 
-        # Using metadata and current item fields, we need to create insertion payload that aligns with schema
+                        }
+        else:
+            metadata = {
+                "page_no.": current_item["page_no."],
+                "index_on_page": current_item["index_on_page"],
+                "content_type": current_item["content_type"],
+                "document_title": current_item["document_title"]
+
+            }
+
+        # Chunk Insertion data:= Using metadata and current item fields, we need to create insertion payload that aligns with schema
         self.chunk_insertion_data = {
             "doc_id": current_item["doc_id"],
             "chunk_id": current_item["chunk_id"],
             "raw_content": current_item["raw_content"],
             "metadata": metadata
-        }
+            }
 
         return self.chunk_insertion_data
     
@@ -199,7 +209,6 @@ class processor_storage():
             float_vectors_list = list_of_vector_embeddings
             #float_vectors = openai_embedding_model.encode_documents(content)
             #float_vectors_list = np.array(float_vectors[0], dtype=float).tolist()
-            
 
             if tokens_count <= self.config.token_limit:
                 payload["Vectors"] = float_vectors_list            
@@ -326,10 +335,7 @@ class processor_storage():
         return collection_data
 
 
-
-
-
-
+"""
 if __name__ == "__main__":
 
     db_storage = processor_storage(
@@ -340,7 +346,7 @@ if __name__ == "__main__":
 
     print(results)
 
-
+"""
     
 
 
