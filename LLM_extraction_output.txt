@@ -1,0 +1,25 @@
+("entity"<|>"DocBench"<|>"Model"<|>"An experimental dataset used in the paper containing 229 documents, average 66 pages per document, average 46,377 tokens per document, 5 document types, and 1,102 questions")##
+("entity"<|>"MMLongBench"<|>"Model"<|>"An experimental dataset used in the paper containing 135 documents, average 47.5 pages per document, average 21,214 tokens per document, 7 document types, and 1,082 questions")##
+("entity"<|>"Dataset"<|>"Concept"<|>"Column in the table representing the name of each dataset")##
+("entity"<|>"Number of Documents"<|>"Concept"<|>"Column in the table representing the count of documents in each dataset")##
+("entity"<|>"Average Pages"<|>"Concept"<|>"Column in the table representing the average pages per document for each dataset")##
+("entity"<|>"Average Tokens"<|>"Concept"<|>"Column in the table representing the average token count per document for each dataset")##
+("entity"<|>"Document Types"<|>"Concept"<|>"Column in the table representing the number of different document types included in each dataset")##
+("entity"<|>"Questions"<|>"Concept"<|>"Column in the table representing the total number of questions associated with each dataset")##
+("entity"<|>"Dataset-level statistics"<|>"Concept"<|>"Table-level aggregated metrics describing datasets used in experiments")##
+
+("relationship"<|>"DocBench"<|>"Dataset"<|>"Is an instance of the Dataset column (one of the datasets listed in the table)"<|>"instance-of, classification"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Dataset"<|>"Is an instance of the Dataset column (one of the datasets listed in the table)"<|>"instance-of, classification"<|>"Main-theme")##
+("relationship"<|>"DocBench"<|>"Number of Documents"<|>"Has 229 documents as reported in the table for DocBench"<|>"has-metric, cardinality"<|>"Main-theme")##
+("relationship"<|>"DocBench"<|>"Average Pages"<|>"Has an average of 66 pages per document as reported for DocBench"<|>"has-metric, average"<|>"Main-theme")##
+("relationship"<|>"DocBench"<|>"Average Tokens"<|>"Has an average of 46,377 tokens per document as reported for DocBench"<|>"has-metric, average"<|>"Main-theme")##
+("relationship"<|>"DocBench"<|>"Document Types"<|>"Includes 5 different document types as reported for DocBench"<|>"has-metric, diversity"<|>"Main-theme")##
+("relationship"<|>"DocBench"<|>"Questions"<|>"Has 1,102 associated questions as reported for DocBench"<|>"has-metric, annotation-count"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Number of Documents"<|>"Has 135 documents as reported in the table for MMLongBench"<|>"has-metric, cardinality"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Average Pages"<|>"Has an average of 47.5 pages per document as reported for MMLongBench"<|>"has-metric, average"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Average Tokens"<|>"Has an average of 21,214 tokens per document as reported for MMLongBench"<|>"has-metric, average"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Document Types"<|>"Includes 7 different document types as reported for MMLongBench"<|>"has-metric, diversity"<|>"Main-theme")##
+("relationship"<|>"MMLongBench"<|>"Questions"<|>"Has 1,082 associated questions as reported for MMLongBench"<|>"has-metric, annotation-count"<|>"Main-theme")##
+("relationship"<|>"Dataset-level statistics"<|>"Dataset"<|>"Summarizes per-dataset attributes (documents, pages, tokens, doc types, questions) in the table"<|>"aggregation, summarization"<|>"Main-theme")##
+
+("context keywords"<|>"dataset statistics, DocBench, MMLongBench, documents, pages per document, tokens per document, document types, question counts, experimental datasets")

@@ -42,3 +42,50 @@ Guidelines for entity_summary:
 
 """
 
+## Prompt for testing purpose for different use-case scenarios
+ENTITIES_GENERATOR_PROMPT = """
+You are an expert of identifying the entities and relationships between those entities from the text, which can be used
+for the creation of knowledge graphs in Graph databases. 
+Here entities refers to the technical solution, technical concept, devices, organization, person, technical event, category.
+Here relationships refers to the "CLEAR RELATION" that the identified entities share with each other.
+
+--- GOAL ---
+Your goal is to look out for the entities and relationships among those identified entities from the provided text, and compile the information in the structured output. 
+
+Step-1: Identiy entities from the text
+--- Guidance for extraction of entities ---
+1. Identify all entities from the text. For each entity, format the following details:
+   entity_name: Name of the entity, capitalize the name.
+   entity_type: Make sure it is one of these types: "Mechanism", "Concept", "Technique", "Technical Implementation", "Framework", "Model"
+   entity_description: It is the brief description of the entity that you will take from text. It introduces entity.
+
+You need to strictly follow the following format for structuring the entities info,
+("entity"<|>"LightRAG"<|>"Framework"<|>"A RAG system using graph and vector retrieval")
+("entity"<|>"Dual-level retrieval"<|>"Concept"<|>"Retrieval strategy using two layers")
+("entity"<|>"Vector similarity"<|>"Mechanism"<|>"Technique to find semantically similar chunks using DB")##
+("entity"<|>"LLM-based profiling"<|>"Technique"<|>"LLM for Profling the query")
+
+Step-2: Identify relationships from the text
+--- Guidance for extraction of relationships ---
+1. Identify all relationships from the text. For each relationship between entities, format the following details
+    source_entity: It is the name of the source entity, as identified in Step-1
+    target_entity: It is the name of the target entity, as identified in Step-1
+    relationship_description: It is the description of "How" source entity and target entity are related to each other.
+    relationship_keywords: one or more high-level key words that summarize the overarching nature of the relationship, focusing on concepts or themes rather than specific details
+
+You need to strictly follow the following format for structuring the relationships info:
+("relationship"<|>"LightRAG"<|>"Dual-level retrieval"<|>"Integrates this mechanism to unify retrieval strategies"<|>"architecture, integration"<|>"Main-theme")
+("relationship"<|>"Dual-level retrieval"<|>"Vector search"<|>"Combines this technique with graph traversal"<|>"methodology, hybrid-search"<|>"Main-theme")
+("relationship"<|>"LightRAG"<|>"Redis"<|>"Optionally supports this tool for session caching"<|>"caching, optimization"<|>"Supporting-theme")
+
+Step-3: Identify the contextual keywords from the text
+--- Guidence for extraction of contextual keywords ---
+1. Identify high-level key words that summarize the main concepts, themes, or topics of the entire text. These should 
+capture the overarching ideas present in the document. You only need to compile this once for a chunk.
+Format the content-level key words as given below:
+("context keywords"<|>"high level keywords")
+
+Provide final output as List object that contains entities, relationships, context keywords. Use ## as list delimeter. 
+
+
+"""

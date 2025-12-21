@@ -2,7 +2,9 @@
 
 from src.document_parsing.sample_data import sample_textual_vectorized_payload_insertion_list, sample_multi_modal_vectorized_payload_insertion_list, Milvus_extracted_multimodal_chunks
 from utils import Milvus_client, perplexity_llm
+from src.content_processor.prompt import ENTITIES_GENERATOR_PROMPT
 import os 
+import perplexity
 
 
 perplexity_api_key = os.getenv("PERPLEXITY_API_KEY")
@@ -102,7 +104,7 @@ class graphdb_processor():
         perplexity_client = perplexity_llm(api_key=perplexity_api_key,
                                            retries=1)
         
-        prompt = "Need_to_add"
+        prompt = ENTITIES_GENERATOR_PROMPT
 
         try:
             # Generate perplexity response
@@ -116,23 +118,33 @@ class graphdb_processor():
                                         {
                                             "type" : "text",
                                             "text": prompt
+                                        },
+                                        {
+                                            "type": "text",
+                                            "text": f"here is the input text: {content_of_chunk}"
                                         }
                                     ]
                             }
                         ],
-                model= "sonar",
-                response_format= {
-                    "type": "json_schema",
-                    "json_schema": {
-                        "schema": table_output_schema.model_json_schema()
-                    }
-
-                }
+                model= "sonar"
 
             )
 
+            KG_material = llm_content_description.choices[0].message.content
 
-        return entity_info
+            # For testing purpose.
+            with open("LLM_extraction_output.txt", "w", encoding= "utf-8") as f:
+                f.write(KG_material)
+            
+            return KG_material
+
+
+        except perplexity.BadRequestError as e:
+            print(f"Invalid request parameters: {e}")
+        except perplexity.RateLimitError as e:
+            print("Rate limit exceeded, please retry later")
+        except perplexity.APIStatusError as e:
+            print(f"API error: {e.status_code}")
 
 
 
