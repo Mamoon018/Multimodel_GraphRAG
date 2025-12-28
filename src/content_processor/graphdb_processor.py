@@ -35,25 +35,28 @@ class graphdb_processor():
         upon the data it has received. It is the function that orchestrates the implementation of the
         class.
         """
+        try:
+            # Get the multi-modal chunks
+            milvus_chunks = self.multi_modal_info_extraction_for_KG()
+            #print(f"Milvus chunks -->  {milvus_chunks}")
 
-        # Get the multi-modal chunks
-        milvus_chunks = self.multi_modal_info_extraction_for_KG()
-        #print(f"Milvus chunks -->  {milvus_chunks}")
+            #KG_entities, parent_entity_info = self.entities_generation_for_multimodal_chunks(milvus_extracted_data= milvus_chunks)
+            #print(f"KG_entities --> {KG_entities}")
 
-        #KG_entities, parent_entity_info = self.entities_generation_for_multimodal_chunks(milvus_extracted_data= milvus_chunks)
-        #print(f"KG_entities --> {KG_entities}")
+            entities, relationships = self.entities_relationship_parsing()
+            #print(f"Parsed entities --> {entities}")
 
-        entities, relationships = self.entities_relationship_parsing()
-        #print(f"Parsed entities --> {entities}")
-
-        entities_with_id,relationships_with_id = self.parent_child_relationships(entity_nodes=entities, relationship_edges=relationships,
-                                                  parent_entity_node=Parent_entity_info)
-        #print(f" -- entities and relationships with IDs -- {entities_with_id}, {relationships_with_id}")
+            entities_with_id,relationships_with_id = self.parent_child_relationships(entity_nodes=entities, relationship_edges=relationships,
+                                                    parent_entity_node=Parent_entity_info)
+            #print(f" -- entities and relationships with IDs -- {entities_with_id}, {relationships_with_id}")
 
 
-        KG_builder_output = self.knowledge_graph_builder(entity_nodes=entities_with_id[:2],relationship_edges= relationships_with_id[:2])
+            KG_builder_query = self.knowledge_graph_builder(entity_nodes=entities_with_id,relationship_edges= relationships_with_id[:2])
 
-        return print(KG_builder_output)
+            return print(KG_builder_query)
+        
+        except Exception as e:
+            raise(f"error occurred in __run__graphdb_processor__ due to {e}") from e 
  
 
     def multi_modal_info_extraction_for_KG(self):
@@ -92,7 +95,7 @@ class graphdb_processor():
             return Milvus_extracted_multimodal
 
         except MilvusException as e:
-            raise(f"Error occurred in Milvus Query chunk extraction operation due to {e}") from e 
+            raise(f"Error occurred in Milvus_query_extraction operation due to {e}") from e 
 
     
     def entities_generation_for_multimodal_chunks(self,milvus_extracted_data):
@@ -234,7 +237,6 @@ class graphdb_processor():
             elif relationship_match:= pattern_relationship.search(record):
                 relationships.append(self._parse_relationships(match=relationship_match))
 
-        
 
         return entities, relationships
 
@@ -269,6 +271,8 @@ class graphdb_processor():
         return relationship_edge
 
 
+
+
     # Define function for the adding IDs into extracted entities and relationships
     def parent_child_relationships(self,entity_nodes, relationship_edges, parent_entity_node):
         """
@@ -300,6 +304,9 @@ class graphdb_processor():
 
         return entity_nodes, relationship_edges
 
+
+
+
     def knowledge_graph_builder(self, entity_nodes, relationship_edges):
         """
         It takes the entities and relationships and runs the cypher query to push them into the knowledge graph
@@ -319,25 +326,57 @@ class graphdb_processor():
         query_execution_confirmation (str): Confirmation about the execution of the query.
 
         """
+        try:
+            entity_cypher_query = []
+            entity_name_id = {}
 
-        entity_cypher_query = []
+            # Entity Cypher Query
+            for entity in entity_nodes:
+                # Entity variables
+                node_type = entity.get("entity_type",[])
+                node_id = entity.get("entity_id",[])
+                node_name = entity["properties"]["entity_name"].replace("#","").replace(" ","").replace(".","")
+                
+                entity_name_id[node_name] = node_id
 
-        for entity in entity_nodes:
-            # Entity variables
-            node_type = entity.get("entity_type",[])
-            node_id = entity.get("entity_id",[])
+                entity_cypher = f" MERGE ( n: {node_type} {{node_id : '{node_id}'}})"
 
-            entity_cypher = f" MERGE ( n: {node_type} {{node_id : '{node_id}'}})"
+                # Entity Properties
+                properties = entity.get("properties",[])
+                entity_properties = ",".join([f"n.{key} = '{value}'" for key,value in properties.items()])
 
-            # Entity Properties
-            properties = entity.get("properties",[])
-            entity_properties = ",".join([f"n.{key} = '{value}'" for key,value in properties.items()])
-
-            entity_cypher += f" ON CREATE SET {entity_properties} " 
-            entity_cypher_query.append(entity_cypher)
+                entity_cypher += f" ON CREATE SET {entity_properties} " 
+                entity_cypher_query.append(entity_cypher)
 
 
-        return entity_cypher_query
+
+            # Relationships Cypher Query
+            relationship_cypher_query = []
+
+            for relationship in relationship_edges:
+                # source, target, id, description, keywords,type
+                """
+                Query format:
+                MATCH (s:source {node_id: entity_id})
+                MATCH (t:target {node_id: entity_id})
+                CREATE (s)-[: BELONGS_TO ] -> (t)
+                """
+
+                source_node = relationship.get("source",[]).replace("#","").replace(" ","").replace(".","")
+                target_node = relationship.get("target",[]).replace("#","").replace(" ","").replace(".","")
+                relationship_properties = relationship["properties"]
+                source_node_id = entity_name_id[source_node]
+                target_node_id = entity_name_id[target_node]
+                relationship_properties_extr = ",".join([f"{key}:'{value}'" for key,value in relationship_properties.items()])
+
+
+                relationship_cypher = f"MATCH (s:{source_node} {{node_id:'{source_node_id}'}}) MATCH (t:{target_node} {{node_id:'{target_node_id}'}}) MERGE (s)-[:BELONGS_TO {{{relationship_properties_extr}}}]->(t)"            
+                relationship_cypher_query.append(relationship_cypher)
+
+            return relationship_cypher_query
+        
+        except Exception as e:
+            raise RuntimeError(f"Error occurred in knowledge graph buildwer due to {e}") from e 
 
 
 
