@@ -337,7 +337,6 @@ class graphdb_processor():
 
 
 
-
 ## Final Run of Graphdb Processor
 
 graphdb = graphdb_processor(textual_VBD_extracted_chunk=sample_textual_vectorized_payload_insertion_list,

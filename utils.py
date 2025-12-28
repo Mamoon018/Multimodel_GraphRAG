@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 from perplexity import Perplexity
 from neo4j import GraphDatabase
+from neo4j.exceptions import AuthError, ServiceUnavailable
 from time import perf_counter
 
 load_dotenv()
@@ -172,10 +173,15 @@ def neo4j_dbconnection():
     """
     It initializes the connection with neo4j instance.
     """
-    auth_1 = (neo4j_user_name,neo4j_password)
-    graph_db_execs = GraphDatabase.driver(uri=neo4j_uri, auth=auth_1)
+    try:
 
-    return graph_db_execs
+        auth_1 = (neo4j_user_name,neo4j_password)
+        graph_db_execs = GraphDatabase.driver(uri=neo4j_uri, auth=auth_1)
+
+        return graph_db_execs
+
+    except (ServiceUnavailable, AuthError) as e:
+        raise RuntimeError(f"Neo4j connection error ocurred {e}") from e
 
 
 
